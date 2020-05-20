@@ -6,6 +6,7 @@ import android.os.Build;
 import android.webkit.WebView;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.rnas.RNAppShortcutsPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
