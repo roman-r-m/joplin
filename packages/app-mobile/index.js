@@ -7,7 +7,7 @@
 // So there's basically still a one way flux: React => SQLite => Redux => React
 
 import { LogBox, AppRegistry } from 'react-native';
-const Root = require('./root').default;
+import { Root, SyncTask } from './root';
 
 // Seems JavaScript developers love adding warnings everywhere, even when these warnings can't be fixed
 // or don't really matter. Because we want important warnings to actually be fixed, we disable
@@ -45,8 +45,7 @@ LogBox.ignoreLogs([
 
 AppRegistry.registerComponent('Joplin', () => Root);
 
-const task = async (_data) => console.log('ZZZ Hello from JS');
-AppRegistry.registerHeadlessTask('JoplinSyncTask', () => task);
+AppRegistry.registerHeadlessTask('JoplinSyncTask', () => SyncTask);
 
 // Using streams on react-native requires to polyfill process.nextTick()
 global.process.nextTick = setImmediate;

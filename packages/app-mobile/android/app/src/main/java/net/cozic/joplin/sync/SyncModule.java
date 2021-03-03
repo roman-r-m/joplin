@@ -34,6 +34,7 @@ public class SyncModule extends ReactContextBaseJavaModule {
     public void configure(final ReadableMap options) {
         Log.i("ZZZ", "Start sync");
 
+        // TODO make periodic
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
 //        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(SyncWorker.class,
 //                PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)

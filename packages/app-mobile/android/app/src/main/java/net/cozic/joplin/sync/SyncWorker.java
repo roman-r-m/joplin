@@ -9,11 +9,10 @@ import androidx.work.WorkerParameters;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.UiThreadUtil;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.common.LifecycleState;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.facebook.react.jstasks.HeadlessJsTaskContext;
 import com.facebook.react.jstasks.HeadlessJsTaskEventListener;
@@ -39,9 +38,16 @@ public class SyncWorker extends Worker implements HeadlessJsTaskEventListener {
     public Result doWork() {
         Log.i("ZZZ", "Do the work!");
 
+        ReactContext context = ((MainApplication) getApplicationContext())
+                .getReactNativeHost().getReactInstanceManager()
+                .getCurrentReactContext();
+        if (context != null && context.getLifecycleState() == LifecycleState.RESUMED) {
+            Log.i("ZZZ", "Not running since the app is in foreground");
+            return Result.retry(); // TODO retry?
+        }
+
         UiThreadUtil.runOnUiThread(() -> {
             ReactNativeHost reactNativeHost = ((MainApplication) getApplicationContext()).getReactNativeHost();
-            ReactApplicationContext context = (ReactApplicationContext) reactNativeHost.getReactInstanceManager().getCurrentReactContext();
             ReactInstanceManager reactInstanceManager = reactNativeHost.getReactInstanceManager();
             ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
             if (reactContext == null) {
