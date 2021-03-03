@@ -236,6 +236,8 @@ dependencies {
 
     // Needed to fix: The number of method references in a .dex file cannot exceed 64K
     implementation 'com.android.support:multidex:2.0.1'
+
+    implementation "androidx.work:work-runtime:2.5.0"
 }
 
 // Run this once to be able to run the application with BUCK

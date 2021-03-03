@@ -675,6 +675,7 @@ class AppComponent extends React.Component {
 				reg.logger().info('Cannot handle share - default folder id is not set');
 			}
 		}
+		NativeModules.SyncModule.configure({});
 	}
 
 	componentWillUnmount() {

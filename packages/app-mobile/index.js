@@ -45,5 +45,8 @@ LogBox.ignoreLogs([
 
 AppRegistry.registerComponent('Joplin', () => Root);
 
+const task = async (_data) => console.log('ZZZ Hello from JS');
+AppRegistry.registerHeadlessTask('JoplinSyncTask', () => task);
+
 // Using streams on react-native requires to polyfill process.nextTick()
 global.process.nextTick = setImmediate;
