@@ -669,6 +669,9 @@ packages/app-desktop/services/spellChecker/SpellCheckerServiceDriverNative.js.ma
 packages/app-desktop/utils/markupLanguageUtils.d.ts
 packages/app-desktop/utils/markupLanguageUtils.js
 packages/app-desktop/utils/markupLanguageUtils.js.map
+packages/app-mobile/BackgroundSyncTask.d.ts
+packages/app-mobile/BackgroundSyncTask.js
+packages/app-mobile/BackgroundSyncTask.js.map
 packages/app-mobile/PluginAssetsLoader.d.ts
 packages/app-mobile/PluginAssetsLoader.js
 packages/app-mobile/PluginAssetsLoader.js.map

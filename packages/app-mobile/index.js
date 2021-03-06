@@ -7,7 +7,8 @@
 // So there's basically still a one way flux: React => SQLite => Redux => React
 
 import { LogBox, AppRegistry } from 'react-native';
-import { Root, SyncTask } from './root';
+import { Root } from './root';
+import SyncTask from './BackgroundSyncTask';
 
 // Seems JavaScript developers love adding warnings everywhere, even when these warnings can't be fixed
 // or don't really matter. Because we want important warnings to actually be fixed, we disable
