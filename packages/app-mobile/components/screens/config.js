@@ -19,6 +19,7 @@ const shim = require('@joplin/lib/shim').default;
 const SearchEngine = require('@joplin/lib/services/searchengine/SearchEngine').default;
 const RNFS = require('react-native-fs');
 const checkPermissions = require('../../utils/checkPermissions.js').default;
+import DirectoryPicker from '../../utils/DirectoryPicker';
 
 class ConfigScreenComponent extends BaseScreenComponent {
 	static navigationOptions() {
@@ -33,6 +34,7 @@ class ConfigScreenComponent extends BaseScreenComponent {
 			creatingReport: false,
 			profileExportStatus: 'idle',
 			profileExportPath: '',
+			fileSystemSyncPath: '',
 		};
 
 		shared.init(this);
@@ -55,6 +57,16 @@ class ConfigScreenComponent extends BaseScreenComponent {
 
 		this.syncStatusButtonPress_ = () => {
 			NavService.go('Status');
+		};
+
+		this.selectDirectoryButtonPress = async () => {
+			try {
+				const dir = await DirectoryPicker.pick();
+				this.setState({ fileSystemSyncPath: dir });
+			} catch (e) {
+				reg.logger().info(`Didn't pick sync dir: ${e}`);
+				this.setState({ fileSystemSyncPath: '' });
+			}
 		};
 
 		this.exportDebugButtonPress_ = async () => {
@@ -411,14 +423,26 @@ class ConfigScreenComponent extends BaseScreenComponent {
 				</View>
 			);
 		} else if (md.type == Setting.TYPE_STRING) {
-			return (
-				<View key={key} style={this.styles().settingContainer}>
-					<Text key="label" style={this.styles().settingText}>
-						{md.label()}
-					</Text>
-					<TextInput autoCorrect={false} autoCompleteType="off" selectionColor={theme.textSelectionColor} keyboardAppearance={theme.keyboardAppearance} autoCapitalize="none" key="control" style={this.styles().settingControl} value={value} onChangeText={value => updateSettingValue(key, value)} secureTextEntry={!!md.secure} />
-				</View>
-			);
+			if (md.key === 'sync.2.path' /* && DirectoryPicker.isAvailable */) {
+				return (
+					<View key={key} style={this.styles().settingContainer}>
+						<Text key="label" style={this.styles().settingText}>
+							{md.label()}
+						</Text>
+						<Button title="Select directory" onPress={this.selectDirectoryButtonPress}></Button>
+						<Text>${this.state.fileSystemSyncPath}</Text>
+					</View>
+				);
+			} else {
+				return (
+					<View key={key} style={this.styles().settingContainer}>
+						<Text key="label" style={this.styles().settingText}>
+							{md.label()}
+						</Text>
+						<TextInput autoCorrect={false} autoCompleteType="off" selectionColor={theme.textSelectionColor} keyboardAppearance={theme.keyboardAppearance} autoCapitalize="none" key="control" style={this.styles().settingControl} value={value} onChangeText={value => updateSettingValue(key, value)} secureTextEntry={!!md.secure} />
+					</View>
+				);
+			}
 		} else {
 			// throw new Error('Unsupported setting type: ' + md.type);
 		}
