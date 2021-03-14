@@ -63,6 +63,7 @@ class ConfigScreenComponent extends BaseScreenComponent {
 			try {
 				const dir = await DirectoryPicker.pick();
 				this.setState({ fileSystemSyncPath: dir });
+				shared.updateSettingValue(this, 'sync.2.path', dir);
 			} catch (e) {
 				reg.logger().info(`Didn't pick sync dir: ${e}`);
 				this.setState({ fileSystemSyncPath: '' });
@@ -424,13 +425,14 @@ class ConfigScreenComponent extends BaseScreenComponent {
 			);
 		} else if (md.type == Setting.TYPE_STRING) {
 			if (md.key === 'sync.2.path' /* && DirectoryPicker.isAvailable */) {
+				const style = Object.assign({}, this.styles().settingContainer, { flexDirection: 'column' });
 				return (
-					<View key={key} style={this.styles().settingContainer}>
+					<View key={key} style={style}>
 						<Text key="label" style={this.styles().settingText}>
 							{md.label()}
 						</Text>
 						<Button title="Select directory" onPress={this.selectDirectoryButtonPress}></Button>
-						<Text>${this.state.fileSystemSyncPath}</Text>
+						<Text>{this.state.fileSystemSyncPath}</Text>
 					</View>
 				);
 			} else {
