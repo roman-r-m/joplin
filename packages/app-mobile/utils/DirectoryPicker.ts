@@ -10,7 +10,8 @@ if (Platform.OS === 'android') {
 }
 
 export default {
-	isAvailable: isAvailable,
+
+	isAvailable: (): boolean => isAvailable,
 
 	async pick(): Promise<string> {
 		return NativeModules.DirectoryPicker.pick();

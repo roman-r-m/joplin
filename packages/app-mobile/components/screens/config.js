@@ -1,6 +1,6 @@
 import Slider from '@react-native-community/slider';
 const React = require('react');
-const { Platform, TouchableOpacity, Linking, View, Switch, StyleSheet, Text, Button, ScrollView, TextInput, Alert, PermissionsAndroid } = require('react-native');
+const { Platform, TouchableOpacity, Linking, View, Switch, StyleSheet, Text, Button, ScrollView, TextInput, Alert, PermissionsAndroid, TouchableNativeFeedback } = require('react-native');
 const { connect } = require('react-redux');
 const { ScreenHeader } = require('../screen-header.js');
 const { _ } = require('@joplin/lib/locale');
@@ -34,7 +34,7 @@ class ConfigScreenComponent extends BaseScreenComponent {
 			creatingReport: false,
 			profileExportStatus: 'idle',
 			profileExportPath: '',
-			fileSystemSyncPath: '',
+			fileSystemSyncPath: Setting.value('sync.2.path'),
 		};
 
 		shared.init(this);
@@ -424,16 +424,18 @@ class ConfigScreenComponent extends BaseScreenComponent {
 				</View>
 			);
 		} else if (md.type == Setting.TYPE_STRING) {
-			if (md.key === 'sync.2.path' /* && DirectoryPicker.isAvailable */) {
-				const style = Object.assign({}, this.styles().settingContainer, { flexDirection: 'column' });
+			if (md.key === 'sync.2.path' && DirectoryPicker.isAvailable()) {
 				return (
-					<View key={key} style={style}>
-						<Text key="label" style={this.styles().settingText}>
-							{md.label()}
-						</Text>
-						<Button title="Select directory" onPress={this.selectDirectoryButtonPress}></Button>
-						<Text>{this.state.fileSystemSyncPath}</Text>
-					</View>
+					<TouchableNativeFeedback key={key} onPress={this.selectDirectoryButtonPress} style={this.styles().settingContainer}>
+						<View style={{ display: 'flex', flexDirection: 'column' }}>
+							<Text key="label" style={this.styles().settingText}>
+								{md.label()}
+							</Text>
+							<Text style={this.styles().settingControl}>
+								{this.state.fileSystemSyncPath}
+							</Text>
+						</View>
+					</TouchableNativeFeedback>
 				);
 			} else {
 				return (
