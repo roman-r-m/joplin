@@ -21,6 +21,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import net.cozic.joplin.extedit.ExternalEditPackage;
+import net.cozic.joplin.share.SharePackage;
+import android.webkit.WebView;
+
 public class MainApplication extends Application implements ReactApplication {
 
   // Needed to fix: The number of method references in a .dex file cannot exceed 64K
@@ -43,6 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           packages.add(new SharePackage());
+          packages.add(new ExternalEditPackage());
           packages.add(new SslPackage());
           return packages;
         }

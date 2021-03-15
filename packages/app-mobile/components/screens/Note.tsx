@@ -42,6 +42,7 @@ const ImagePicker = require('react-native-image-picker').default;
 import SelectDateTimeDialog from '../SelectDateTimeDialog';
 import ShareExtension from '../../utils/ShareExtension.js';
 import CameraView from '../CameraView';
+import { NativeModules } from 'react-native';
 const urlUtils = require('@joplin/lib/urlUtils');
 
 const emptyArray: any[] = [];
@@ -794,6 +795,13 @@ class NoteScreenComponent extends BaseScreenComponent {
 		Clipboard.setString(Note.markdownTag(note));
 	}
 
+	async editExternal_onPress() {
+		const note = this.state.note;
+		const targetPath = `${Setting.value('resourceDir')}/ext-edit`;
+		await shim.fsDriver().writeFile(targetPath, note.body, 'utf8');
+		await NativeModules.ExternalEditModule.open(targetPath);
+	}
+
 	sideMenuOptions() {
 		const note = this.state.note;
 		if (!note) return [];
@@ -909,6 +917,12 @@ class NoteScreenComponent extends BaseScreenComponent {
 				},
 			});
 		}
+		output.push({
+			title: _('Edit in External Editor'),
+			onPress: () => {
+				this.editExternal_onPress();
+			},
+		});
 		output.push({
 			title: _('Properties'),
 			onPress: () => {
