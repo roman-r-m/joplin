@@ -75,12 +75,17 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
             promise.reject("2", "Cancelled");
             return;
         }
-        WritableMap map = Arguments.createMap();
+//        WritableMap map = Arguments.createMap();
 
+        // ext sdcard: content://com.android.externalstorage.documents/tree/1DEB-1712%3AJoplin
         Uri uri = data.getData();
-        map.putString("uri", uri.toString());
-        map.putString("patht", getFileName(uri, activity.getContentResolver()));
-        promise.resolve(map);
+//        map.putString("uri", uri.toString());
+//        map.putString("patht", getFileName(uri, activity.getContentResolver()));
+//        promise.resolve(map);
+//        if (uri.getAuthority().equalsIgnoreCase("com.android.externalstorage.documents")) {
+//            String path = uri.getPath().replace("/tree", "/storage")
+//        }
+        promise.resolve("/storage/1DEB-1712/Joplin");
     }
 
     @Override
