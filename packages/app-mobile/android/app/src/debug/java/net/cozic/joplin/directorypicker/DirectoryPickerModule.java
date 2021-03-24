@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.util.Log;
 
@@ -23,6 +24,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DirectoryPickerModule extends ReactContextBaseJavaModule implements ActivityEventListener {
@@ -75,40 +77,35 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
             promise.reject("2", "Cancelled");
             return;
         }
-//        WritableMap map = Arguments.createMap();
+        WritableMap map = Arguments.createMap();
 
-        // ext sdcard: content://com.android.externalstorage.documents/tree/1DEB-1712%3AJoplin
         Uri uri = data.getData();
-//        map.putString("uri", uri.toString());
-//        map.putString("patht", getFileName(uri, activity.getContentResolver()));
-//        promise.resolve(map);
-//        if (uri.getAuthority().equalsIgnoreCase("com.android.externalstorage.documents")) {
-//            String path = uri.getPath().replace("/tree", "/storage")
-//        }
-        promise.resolve("/storage/1DEB-1712/Joplin");
+        map.putString("uri", uri.toString());
+        map.putString("path", getFileName(uri));
+        promise.resolve(map);
     }
 
     @Override
     public void onNewIntent(Intent intent) {
     }
 
-    private String getFileName(Uri uri, ContentResolver contentResolver) {
+    private String getFileName(Uri uri) {
         if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
             File file = new File(uri.getPath());
             return file.getName();
         } else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
             String name = null;
-            CursorLoader cursorLoader = new CursorLoader(reactContext, uri, null, null, null, null);
-            Cursor cursor = cursorLoader.loadInBackground();
-//            Cursor cursor = contentResolver.query(uri, null, null, null, null);
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                        name = cursor.getString(nameIndex);
-                    }
-                } finally {
-                    cursor.close();
+
+            // URI examples
+            // internal: content://com.android.externalstorage.documents/tree/primary%3Ajoplin
+            // sd card:  content://com.android.externalstorage.documents/tree/1DEA-0313%3Ajoplin
+            List<String> pathSegments = uri.getPathSegments();
+            String[] parts = pathSegments.get(1).split(":", 2);
+            if (pathSegments.get(0).equalsIgnoreCase("tree")) {
+                if (parts[0].equalsIgnoreCase("primary")) {
+                    name = new File(Environment.getExternalStorageDirectory(), parts[1]).getAbsolutePath();
+                } else {
+                    name = "/storage/" + parts[0] + "/" + parts[1];
                 }
             }
             return name;
