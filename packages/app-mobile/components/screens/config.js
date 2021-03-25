@@ -62,8 +62,8 @@ class ConfigScreenComponent extends BaseScreenComponent {
 		this.selectDirectoryButtonPress = async () => {
 			try {
 				const dir = await DirectoryPicker.pick();
-				this.setState({ fileSystemSyncPath: dir });
-				shared.updateSettingValue(this, 'sync.2.path', dir);
+				this.setState({ fileSystemSyncPath: dir.path });
+				shared.updateSettingValue(this, 'sync.2.path', dir.path);
 			} catch (e) {
 				reg.logger().info(`Didn't pick sync dir: ${e}`);
 				this.setState({ fileSystemSyncPath: '' });
