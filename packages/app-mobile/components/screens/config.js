@@ -66,7 +66,6 @@ class ConfigScreenComponent extends BaseScreenComponent {
 				shared.updateSettingValue(this, 'sync.2.path', dir.path);
 			} catch (e) {
 				reg.logger().info(`Didn't pick sync dir: ${e}`);
-				this.setState({ fileSystemSyncPath: '' });
 			}
 		};
 
@@ -427,7 +426,7 @@ class ConfigScreenComponent extends BaseScreenComponent {
 			if (md.key === 'sync.2.path' && DirectoryPicker.isAvailable()) {
 				return (
 					<TouchableNativeFeedback key={key} onPress={this.selectDirectoryButtonPress} style={this.styles().settingContainer}>
-						<View style={{ display: 'flex', flexDirection: 'column' }}>
+						<View style={this.styles().settingContainer}>
 							<Text key="label" style={this.styles().settingText}>
 								{md.label()}
 							</Text>
