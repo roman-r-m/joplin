@@ -52,8 +52,8 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
     public void pick(Promise promise) {
         try {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-//            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 
             this.promise.set(promise);
@@ -81,7 +81,8 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
 
         Uri uri = data.getData();
 
-        reactContext.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        reactContext.getContentResolver().takePersistableUriPermission(uri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION & Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         map.putString("uri", uri.toString());
         map.putString("path", getFileName(uri));
