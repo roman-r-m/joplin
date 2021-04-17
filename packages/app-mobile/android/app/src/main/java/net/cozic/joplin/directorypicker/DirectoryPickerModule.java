@@ -3,17 +3,13 @@ package net.cozic.joplin.directorypicker;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.OpenableColumns;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.IntentCompat;
-import androidx.loader.content.CursorLoader;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -30,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DirectoryPickerModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
     private static final int CODE = 54321;
+    public static final String TAG = "JoplinDirPicker";
 
     private final ReactApplicationContext reactContext;
     private final AtomicReference<Promise> promise = new AtomicReference<>(null);
@@ -55,7 +52,10 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
     public void pick(Promise promise) {
         try {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+//            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
             this.promise.set(promise);
             if (!reactContext.startActivityForResult(intent, CODE, null)) {
                 promise.reject("1", "Failed to pick directory");
@@ -80,6 +80,9 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
         WritableMap map = Arguments.createMap();
 
         Uri uri = data.getData();
+
+        reactContext.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
         map.putString("uri", uri.toString());
         map.putString("path", getFileName(uri));
         promise.resolve(map);
@@ -99,18 +102,22 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
             // URI examples
             // internal: content://com.android.externalstorage.documents/tree/primary%3Ajoplin
             // sd card:  content://com.android.externalstorage.documents/tree/1DEA-0313%3Ajoplin
+
+            // TODO see android.provider.DocumentsContract#EXTERNAL_STORAGE_PROVIDER_AUTHORITY
+            // and other constants there
             List<String> pathSegments = uri.getPathSegments();
-            String[] parts = pathSegments.get(1).split(":", 2);
             if (pathSegments.get(0).equalsIgnoreCase("tree")) {
+                String[] parts = pathSegments.get(1).split(":", 2);
                 if (parts[0].equalsIgnoreCase("primary")) {
                     name = new File(Environment.getExternalStorageDirectory(), parts[1]).getAbsolutePath();
                 } else {
                     name = "/storage/" + parts[0] + "/" + parts[1];
                 }
             }
+            Log.i(TAG, "Resolved content URI " + uri + " to path " + name);
             return name;
         } else {
-            Log.w("joplin", "Unknown URI scheme: " + uri.getScheme());
+            Log.w(TAG, "Unknown URI scheme: " + uri.getScheme());
             return null;
         }
     }
