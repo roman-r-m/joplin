@@ -52,9 +52,9 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
     public void pick(Promise promise) {
         try {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 
             this.promise.set(promise);
             if (!reactContext.startActivityForResult(intent, CODE, null)) {
@@ -103,9 +103,6 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
             // URI examples
             // internal: content://com.android.externalstorage.documents/tree/primary%3Ajoplin
             // sd card:  content://com.android.externalstorage.documents/tree/1DEA-0313%3Ajoplin
-
-            // TODO see android.provider.DocumentsContract#EXTERNAL_STORAGE_PROVIDER_AUTHORITY
-            // and other constants there
             List<String> pathSegments = uri.getPathSegments();
             if (pathSegments.get(0).equalsIgnoreCase("tree")) {
                 String[] parts = pathSegments.get(1).split(":", 2);
