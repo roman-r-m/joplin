@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -26,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DirectoryPickerModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
     private static final int CODE = 54321;
-    public static final String TAG = "JoplinDirPicker";
+    public static final String TAG = "RNDirPicker";
 
     private final ReactApplicationContext reactContext;
     private final AtomicReference<Promise> promise = new AtomicReference<>(null);
@@ -52,10 +53,6 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
     public void pick(Promise promise) {
         try {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-
             this.promise.set(promise);
             if (!reactContext.startActivityForResult(intent, CODE, null)) {
                 promise.reject("1", "Failed to pick directory");
@@ -80,9 +77,6 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
         WritableMap map = Arguments.createMap();
 
         Uri uri = data.getData();
-
-        reactContext.getContentResolver().takePersistableUriPermission(uri,
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION & Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         map.putString("uri", uri.toString());
         map.putString("path", getFileName(uri));
@@ -109,7 +103,7 @@ public class DirectoryPickerModule extends ReactContextBaseJavaModule implements
                 if (parts[0].equalsIgnoreCase("primary")) {
                     name = new File(Environment.getExternalStorageDirectory(), parts[1]).getAbsolutePath();
                 } else {
-                    name = "/storage/" + parts[0] + "/" + parts[1];
+                    name = "/storage/" + DocumentsContract.getTreeDocumentId(uri).replace(':', '/');
                 }
             }
             Log.i(TAG, "Resolved content URI " + uri + " to path " + name);
