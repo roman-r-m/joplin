@@ -42,6 +42,7 @@ const ImagePicker = require('react-native-image-picker').default;
 import SelectDateTimeDialog from '../SelectDateTimeDialog';
 import ShareExtension from '../../utils/ShareExtension.js';
 import CameraView from '../CameraView';
+import NoteBodyEditor from '../NoteEditor/NoteBodyEditor';
 const urlUtils = require('@joplin/lib/urlUtils');
 
 const emptyArray: any[] = [];
@@ -1128,24 +1129,36 @@ class NoteScreenComponent extends BaseScreenComponent {
 			// 	);
 
 			bodyComponent = (
-				<TextInput
-					autoCapitalize="sentences"
+				<NoteBodyEditor
 					style={this.styles().bodyTextInput}
 					ref="noteBodyTextField"
-					multiline={true}
-					value={note.body}
+					defaultValue={note.body}
 					onChangeText={(text: string) => this.body_changeText(text)}
 					onSelectionChange={this.body_selectionChange}
-					blurOnSubmit={false}
 					selectionColor={theme.textSelectionColor}
 					keyboardAppearance={theme.keyboardAppearance}
-					placeholder={_('Add body')}
 					placeholderTextColor={theme.colorFaded}
-					// need some extra padding for iOS so that the keyboard won't cover last line of the note
-					// see https://github.com/laurent22/joplin/issues/3607
-					paddingBottom={ Platform.OS === 'ios' ? 40 : 0}
 				/>
 			);
+			// bodyComponent = (
+			// 	<TextInput
+			// 		autoCapitalize="sentences"
+			// 		style={this.styles().bodyTextInput}
+			// 		ref="noteBodyTextField"
+			// 		multiline={true}
+			// 		value={note.body}
+			// 		onChangeText={(text: string) => this.body_changeText(text)}
+			// 		onSelectionChange={this.body_selectionChange}
+			// 		blurOnSubmit={false}
+			// 		selectionColor={theme.textSelectionColor}
+			// 		keyboardAppearance={theme.keyboardAppearance}
+			// 		placeholder={_('Add body')}
+			// 		placeholderTextColor={theme.colorFaded}
+			// 		// need some extra padding for iOS so that the keyboard won't cover last line of the note
+			// 		// see https://github.com/laurent22/joplin/issues/3607
+			// 		paddingBottom={ Platform.OS === 'ios' ? 40 : 0}
+			// 	/>
+			// );
 		}
 
 		const renderActionButton = () => {
