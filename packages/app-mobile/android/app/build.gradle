@@ -210,6 +210,8 @@ dependencies {
     //implementation "org.commonmark:commonmark:0.17.2"
     implementation "io.noties.markwon:core:4.6.2"
     implementation "io.noties.markwon:editor:4.6.2"
+    implementation "io.noties.markwon:ext-tasklist:4.6.2"
+    implementation "io.noties.markwon:ext-strikethrough:4.6.2"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion

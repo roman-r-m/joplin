@@ -1,9 +1,7 @@
 package net.cozic.joplin.textinput;
 
 import android.graphics.Typeface;
-import android.text.Editable;
 import android.text.Selection;
-import android.text.Spanned;
 import android.text.style.StyleSpan;
 
 import androidx.annotation.NonNull;
@@ -19,14 +17,16 @@ import com.facebook.react.views.textinput.ReactTextInputManager;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
 
+import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.Markwon;
-import io.noties.markwon.core.spans.StrongEmphasisSpan;
-import io.noties.markwon.editor.AbstractEditHandler;
+import io.noties.markwon.SoftBreakAddsNewLinePlugin;
+import io.noties.markwon.core.MarkwonTheme;
 import io.noties.markwon.editor.MarkwonEditor;
 import io.noties.markwon.editor.MarkwonEditorTextWatcher;
-import io.noties.markwon.editor.MarkwonEditorUtils;
-import io.noties.markwon.editor.PersistedSpans;
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
+import io.noties.markwon.ext.tasklist.TaskListPlugin;
 
 public class TextInputPackage implements com.facebook.react.ReactPackage {
     @NonNull
@@ -54,8 +54,11 @@ public class TextInputPackage implements com.facebook.react.ReactPackage {
                 if (value) {
 //                    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                     final Markwon markwon = Markwon.builder(reactContext)
+                            .usePlugin(SoftBreakAddsNewLinePlugin.create())
+                            .usePlugin(TaskListPlugin.create(reactContext))
+                            .usePlugin(StrikethroughPlugin.create())
                             .build();
-                    final MarkwonEditor editor = MarkwonEditor.builder(markwon)
+                    final MarkwonEditor editor = MaqrkwonEditor.builder(markwon)
 //                            .useEditHandler(new AbstractEditHandler<StrongEmphasisSpan>() {
 //                                @Override
 //                                public void configurePersistedSpans(@NonNull PersistedSpans.Builder builder) {
@@ -101,7 +104,10 @@ public class TextInputPackage implements com.facebook.react.ReactPackage {
 //                                }
 //                            })
                             .build();
-                    view.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
+//                    view.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
+
+                    view.addTextChangedListener(MarkwonEditorTextWatcher.withPreRender(
+                            editor, Executors.newCachedThreadPool(), view));
 
 //                    view.addTextChangedListener(new TextWatcher() {
 //
