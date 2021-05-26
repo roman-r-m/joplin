@@ -46,6 +46,7 @@ public class MainApplication extends Application implements ReactApplication {
           packages.add(new SharePackage());
           packages.add(new SslPackage());
           packages.add(new TextInputPackage());
+          packages.add(new MdEditorPackage());
           return packages;
         }
 

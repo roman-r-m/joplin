@@ -207,7 +207,8 @@ android {
 }
 
 dependencies {
-    //implementation "org.commonmark:commonmark:0.17.2"
+    implementation "org.commonmark:commonmark:0.17.2"
+
     implementation "io.noties.markwon:core:4.6.2"
     implementation "io.noties.markwon:editor:4.6.2"
     implementation "io.noties.markwon:ext-tasklist:4.6.2"
@@ -218,6 +219,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    testImplementation 'junit:junit:4.12'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'

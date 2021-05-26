@@ -1,6 +1,7 @@
 import { _ } from '@joplin/lib/locale';
 import React = require('react');
-const { TextInput } = require('react-native');
+// const { TextInput } = require('react-native');
+import { requireNativeComponent } from 'react-native';
 
 interface Props {
     defaultValue: string;
@@ -16,6 +17,7 @@ interface State {
     defaultValue: string;
 }
 
+const MdEditor = requireNativeComponent('MdEditor');
 class NoteBodyEditor extends React.Component<Props, State> {
 	// inputRef: React.RefObject<typeof TextInput>;
 	constructor(props: Props) {
@@ -31,20 +33,22 @@ class NoteBodyEditor extends React.Component<Props, State> {
 
 	render() {
 		return (
-			<TextInput
-				autoCapitalize="sentences"
-				style={this.props.style}
-				// ref={this.inputRef}
-				multiline={true}
-				defaultValue={this.state.defaultValue}
-				onChangeText={this.props.onChangeText}
-				onSelectionChange={this.props.onSelectionChange}
-				blurOnSubmit={false}
-				selectionColor={this.props.selectionColor}
-				keyboardAppearance={this.props.keyboardAppearance}
-				placeholder={_('Add body')}
-				placeholderTextColor={this.props.placeholderTextColor}
-			/>
+			<MdEditor />
+			// <TextInput
+			// 	enableMdHighlight={true}
+			// 	autoCapitalize="sentences"
+			// 	style={this.props.style}
+			// 	// ref={this.inputRef}
+			// 	multiline={true}
+			// 	defaultValue={this.state.defaultValue}
+			// 	onChangeText={this.props.onChangeText}
+			// 	onSelectionChange={this.props.onSelectionChange}
+			// 	blurOnSubmit={false}
+			// 	selectionColor={this.props.selectionColor}
+			// 	keyboardAppearance={this.props.keyboardAppearance}
+			// 	placeholder={_('Add body')}
+			// 	placeholderTextColor={this.props.placeholderTextColor}
+			// />
 		);
 	}
 }
