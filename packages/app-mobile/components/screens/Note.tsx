@@ -200,6 +200,8 @@ class NoteScreenComponent extends BaseScreenComponent {
 		};
 
 		this.refreshResource = async (resource: any, noteBody: string = null) => {
+			console.log(`refresh resource ${noteBody}`);
+
 			if (noteBody === null && this.state.note && this.state.note.body) noteBody = this.state.note.body;
 			if (noteBody === null) return;
 
@@ -677,19 +679,22 @@ class NoteScreenComponent extends BaseScreenComponent {
 
 		const resourceTag = Resource.markdownTag(resource);
 
-		const newNote = Object.assign({}, this.state.note);
+		await this.refs.noteBodyTextField.insertAtSelection(`\n${resourceTag}\n`);
 
-		if (this.state.mode == 'edit' && !this.useBetaEditor() && !!this.selection) {
-			const prefix = newNote.body.substring(0, this.selection.start);
-			const suffix = newNote.body.substring(this.selection.end);
-			newNote.body = `${prefix}\n${resourceTag}\n${suffix}`;
-		} else {
-			newNote.body += `\n${resourceTag}`;
-		}
-
-		this.setState({ note: newNote });
-
-		this.refreshResource(resource, newNote.body);
+		//
+		// const newNote = Object.assign({}, this.state.note);
+		//
+		// if (this.state.mode == 'edit' && !this.useBetaEditor() && !!this.selection) {
+		// const prefix = newNote.body.substring(0, this.selection.start);
+		// const suffix = newNote.body.substring(this.selection.end);
+		// newNote.body = `${prefix}\n${resourceTag}\n${suffix}`;
+		// } else {
+		// newNote.body += `\n${resourceTag}`;
+		// }
+		//
+		// this.setState({ note: newNote });
+		//
+		this.refreshResource(resource, this.state.body);
 
 		this.scheduleSave();
 	}

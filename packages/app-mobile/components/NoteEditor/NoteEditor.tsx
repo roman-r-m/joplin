@@ -8,7 +8,7 @@ interface Props {
     ref: any;
     style: any;
     defaultValue: string;
-    onChangeText: (text: string)=> void;
+    onChangeText: (text: string)=> Promise<void>;
     onSelectionChange: (e: NativeSyntheticEvent<TextInputSelectionChangeEventData>)=> void;
     theme: any;
 }
@@ -18,17 +18,28 @@ export default React.forwardRef((props: Props, ref: any) => {
 	const inputRef = useRef(null);
 
 	useImperativeHandle(ref, () => {
-		// TODO
+		return {
+			insertAtSelection: async (insert: string) => {
+				if (selection) {
+					const start = selection.selection.start;
+					const end = selection.selection.end;
+					const newText = text.substring(0, start) + insert + text.substring(end);
+					await setText2(newText);
+				} else {
+					await setText2(text + insert);
+				}
+			},
+		};
 	});
 
 	const [text, setText] = useState<string>(props.defaultValue);
-	const setText2 = (text: string) => {
+	const setText2 = async (text: string) => {
 		setText(text);
-		props.onChangeText(text);
+		await props.onChangeText(text);
 	};
 
-	const onChangeText = useCallback((text: string) => {
-		setText2(text);
+	const onChangeText = useCallback(async (text: string) => {
+		await setText2(text);
 	}, [props.onChangeText]);
 
 	const [selection, setSelection] = useState<TextInputSelectionChangeEventData>(null);
@@ -37,18 +48,15 @@ export default React.forwardRef((props: Props, ref: any) => {
 		props.onSelectionChange(e);
 	}, [props.onSelectionChange]);
 
-	const wrapSelectionWith = (delimiter: string) => {
-		console.log(`wrap selection with ${delimiter}`);
-		console.log(`selection is ${JSON.stringify(selection.selection)}`);
-
+	const wrapSelectionWith = async (delimiter: string) => {
 		if (!selection) return;
 
 		const start = selection.selection.start;
 		const end = selection.selection.end;
 		if (start == end) {
-			setText2(text.substring(0, start) + delimiter + text.substring(start));
+			await setText2(text.substring(0, start) + delimiter + text.substring(start));
 		} else {
-			setText2(text.substring(0, start) + delimiter + text.substring(start, end) + delimiter + text.substring(end));
+			await setText2(text.substring(0, start) + delimiter + text.substring(start, end) + delimiter + text.substring(end));
 		}
 	};
 
