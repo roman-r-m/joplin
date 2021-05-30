@@ -4,10 +4,15 @@ import { Text, NativeSyntheticEvent, TextInputSelectionChangeEventData, Touchabl
 const { Platform, TextInput } = require('react-native');
 const React = require('react');
 
+interface Selection {
+    start: number;
+    end: number;
+}
 interface Props {
     ref: any;
     style: any;
     defaultValue: string;
+    initialSelection: Selection;
     onChangeText: (text: string)=> Promise<void>;
     onSelectionChange: (e: NativeSyntheticEvent<TextInputSelectionChangeEventData>)=> void;
     theme: any;
@@ -20,9 +25,10 @@ export default React.forwardRef((props: Props, ref: any) => {
 	useImperativeHandle(ref, () => {
 		return {
 			insertAtSelection: async (insert: string) => {
+				console.log(`insert at selection: ${JSON.stringify(selection)}`);
 				if (selection) {
-					const start = selection.selection.start;
-					const end = selection.selection.end;
+					const start = selection.start;
+					const end = selection.end;
 					const newText = text.substring(0, start) + insert + text.substring(end);
 					await setText2(newText);
 				} else {
@@ -42,17 +48,20 @@ export default React.forwardRef((props: Props, ref: any) => {
 		await setText2(text);
 	}, [props.onChangeText]);
 
-	const [selection, setSelection] = useState<TextInputSelectionChangeEventData>(null);
+	const [selection, setSelection] = useState<Selection>(props.initialSelection);
 	const onSelectionChange = useCallback((e: NativeSyntheticEvent<TextInputSelectionChangeEventData>)=> {
-		setSelection(e.nativeEvent);
+		console.log(`on selection change ${JSON.stringify(e.nativeEvent.selection)}`);
+		if (selection && !e.nativeEvent.selection) return;
+
+		setSelection(e.nativeEvent.selection);
 		props.onSelectionChange(e);
 	}, [props.onSelectionChange]);
 
 	const wrapSelectionWith = async (delimiter: string) => {
 		if (!selection) return;
 
-		const start = selection.selection.start;
-		const end = selection.selection.end;
+		const start = selection.start;
+		const end = selection.end;
 		if (start == end) {
 			await setText2(text.substring(0, start) + delimiter + text.substring(start));
 		} else {
