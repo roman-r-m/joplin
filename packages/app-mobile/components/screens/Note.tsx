@@ -1132,7 +1132,7 @@ class NoteScreenComponent extends BaseScreenComponent {
 				<NoteEditor
 					style={this.styles().bodyTextInput}
 					ref="noteBodyTextField"
-					value={note.body}
+					defaultValue={note.body}
 					onChangeText={(text: string) => this.body_changeText(text)}
 					onSelectionChange={this.body_selectionChange}
 					theme={theme}
