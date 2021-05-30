@@ -74,6 +74,7 @@ export default React.forwardRef((props: Props, ref: any) => {
 	return (
 		<View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
 			<TextInput
+				enableMarkdown={true}
 				ref={inputRef}
 				autoCapitalize="sentences"
 				style={style}

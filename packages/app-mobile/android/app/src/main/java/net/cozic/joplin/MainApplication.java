@@ -14,6 +14,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 
+import net.cozic.joplin.markdown.MarkdownPackage;
 import net.cozic.joplin.share.SharePackage;
 import net.cozic.joplin.ssl.SslPackage;
 
@@ -44,6 +45,7 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           packages.add(new SharePackage());
           packages.add(new SslPackage());
+          packages.add(new MarkdownPackage());
           return packages;
         }
 
