@@ -1,13 +1,16 @@
 package net.cozic.joplin.markdown;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.LeadingMarginSpan;
 import android.text.style.QuoteSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
 
@@ -23,6 +26,7 @@ import com.facebook.react.views.textinput.ReactTextInputManager;
 
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.BlockQuote;
+import org.commonmark.node.Delimited;
 import org.commonmark.node.Emphasis;
 import org.commonmark.node.Heading;
 import org.commonmark.node.ListItem;
@@ -58,7 +62,7 @@ public class MarkdownPackage implements ReactPackage {
                     editText.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                            Log.i("ZZZ", "beforeTextChanged: start=" + start + ", count=" + count + ", after=" + after);
                         }
 
                         @Override
@@ -69,8 +73,11 @@ public class MarkdownPackage implements ReactPackage {
                         @Override
                         public void afterTextChanged(Editable s) {
                             long start = System.currentTimeMillis();
-//                s.clearSpans();
+
                             for (TypefaceSpan span : s.getSpans(0, s.length(), TypefaceSpan.class)) {
+                                s.removeSpan(span);
+                            }
+                            for (StyleSpan span : s.getSpans(0, s.length(), StyleSpan.class)) {
                                 s.removeSpan(span);
                             }
                             for (RelativeSizeSpan span : s.getSpans(0, s.length(), RelativeSizeSpan.class)) {
@@ -80,6 +87,9 @@ public class MarkdownPackage implements ReactPackage {
                                 s.removeSpan(span);
                             }
                             for (QuoteSpan span : s.getSpans(0, s.length(), QuoteSpan.class)) {
+                                s.removeSpan(span);
+                            }
+                            for (ForegroundColorSpan span : s.getSpans(0, s.length(), ForegroundColorSpan.class)) {
                                 s.removeSpan(span);
                             }
 
@@ -100,15 +110,25 @@ public class MarkdownPackage implements ReactPackage {
                                     SourceSpan end = node.getSourceSpans().get(node.getSourceSpans().size() - 1);
                                     int startPos = lineStarts.get(start.getLineIndex()) + start.getColumnIndex();
                                     int endPos = lineStarts.get(end.getLineIndex()) + end.getColumnIndex() + end.getLength();
+                                    if (node instanceof Delimited) {
+                                        startPos += ((Delimited) node).getOpeningDelimiter().length();
+                                        endPos -= ((Delimited) node).getClosingDelimiter().length();
+                                    }
                                     for (Object span : spans) {
                                         s.setSpan(span, startPos, endPos, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    }
+                                    if (node instanceof Delimited) {
+                                        int startDelimiterLen = ((Delimited) node).getOpeningDelimiter().length();
+                                        int endDelimiterLen  = ((Delimited) node).getClosingDelimiter().length();
+                                        s.setSpan(new ForegroundColorSpan(Color.LTGRAY), startPos - startDelimiterLen, startPos, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        s.setSpan(new ForegroundColorSpan(Color.LTGRAY), endPos, endPos + endDelimiterLen, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                                     }
                                 }
 
                                 @Override
                                 public void visit(Emphasis emphasis) {
                                     super.visit(emphasis);
-                                    setSpans(emphasis, new TypefaceSpan(Typeface.DEFAULT_BOLD));
+                                    setSpans(emphasis, new StyleSpan(Typeface.ITALIC));
                                 }
 
                                 @Override
@@ -140,8 +160,6 @@ public class MarkdownPackage implements ReactPackage {
                                     setSpans(blockQuote, new QuoteSpan());
                                     super.visit(blockQuote);
                                 }
-
-
                             });
 
                             Log.w("ZZZ", "delay: " + (System.currentTimeMillis() - start));
