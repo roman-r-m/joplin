@@ -652,6 +652,14 @@ class AppComponent extends React.Component {
 		};
 	}
 
+	// shouldComponentUpdate(nextProps: any, _nextState: any) {
+	// 	if (nextProps.note.body !== this.props.note.body) {
+	// 		return false;
+	// 	} else {
+	// 		return true;
+	// 	}
+	// }
+
 	// 2020-10-08: It seems the initialisation code is quite fragile in general and should be kept simple.
 	// For example, adding a loading screen as was done in this commit: https://github.com/laurent22/joplin/commit/569355a3182bc12e50a54249882e3d68a72c2b28.
 	// had for effect that sharing with the app would create multiple instances of the app, thus breaking
@@ -728,6 +736,10 @@ class AppComponent extends React.Component {
 	}
 
 	componentDidUpdate(prevProps: any) {
+		console.log(`root did update:
+		prev: ${JSON.stringify(prevProps)}
+		curr: ${JSON.stringify(this.props)}
+		`);
 		if (this.props.showSideMenu !== prevProps.showSideMenu) {
 			Animated.timing(this.state.sideMenuContentOpacity, {
 				toValue: this.props.showSideMenu ? 0.5 : 0,

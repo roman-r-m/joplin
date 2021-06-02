@@ -18,7 +18,11 @@ interface Props {
     theme: any;
 }
 
-export default React.forwardRef((props: Props, ref: any) => {
+export default React.memo(React.forwardRef((props: Props, ref: any) => {
+
+	console.log('-----------------------------------------');
+
+	// console.log(`ZZZ render editor, props: ${JSON.stringify(props)}`);
 
 	const inputRef = useRef(null);
 
@@ -79,7 +83,6 @@ export default React.forwardRef((props: Props, ref: any) => {
 				autoCapitalize="sentences"
 				style={style}
 				multiline={true}
-				defaultValue={props.defaultValue}
 				value={text}
 				onChangeText={onChangeText}
 				onSelectionChange={onSelectionChange}
@@ -107,4 +110,4 @@ export default React.forwardRef((props: Props, ref: any) => {
 		</View>
 	);
 
-});
+}));
