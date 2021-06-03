@@ -1,4 +1,5 @@
 const { _ } = require('@joplin/lib/locale');
+import Setting from '@joplin/lib/models/Setting';
 import { useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Text, NativeSyntheticEvent, TextInputSelectionChangeEventData, TouchableOpacity, View } from 'react-native';
 const { Platform, TextInput } = require('react-native');
@@ -75,10 +76,27 @@ export default React.memo(React.forwardRef((props: Props, ref: any) => {
 
 	const style = Object.assign({}, props.style, { flex: 1 });
 
+	let buttons = null;
+	if (Setting.value('editor.beta')) {
+		buttons =
+		<View style={{ flexDirection: 'row', flex: 0 }}>
+			<TouchableOpacity onPress={_e => wrapSelectionWith('**')}>
+				<Text style={{ padding: 8, fontSize: 16, fontWeight: 'bold' }}>
+					{'B'}
+				</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={_e => wrapSelectionWith('_')}>
+				<Text style={{ padding: 8, fontSize: 16, fontStyle: 'italic' }}>
+					{'I'}
+				</Text>
+			</TouchableOpacity>
+		</View>;
+	}
+
 	return (
 		<View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
 			<TextInput
-				enableMarkdown={true}
+				enableMarkdown={Setting.value('editor.beta')}
 				ref={inputRef}
 				autoCapitalize="sentences"
 				style={style}
@@ -95,18 +113,7 @@ export default React.memo(React.forwardRef((props: Props, ref: any) => {
 				// seehttps://github.com/laurent22/joplin/issues/3607
 				paddingBottom={ Platform.OS === 'ios' ? 40 : 0}
 			/>
-			<View style={{ flexDirection: 'row', flex: 0 }}>
-				<TouchableOpacity onPress={_e => wrapSelectionWith('**')}>
-					<Text style={{ padding: 8, fontSize: 16, fontWeight: 'bold' }}>
-						{'B'}
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={_e => wrapSelectionWith('_')}>
-					<Text style={{ padding: 8, fontSize: 16, fontStyle: 'italic' }}>
-						{'I'}
-					</Text>
-				</TouchableOpacity>
-			</View>
+			{buttons}
 		</View>
 	);
 

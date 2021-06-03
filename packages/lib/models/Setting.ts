@@ -746,7 +746,7 @@ class Setting extends BaseModel {
 				value: false,
 				type: SettingItemType.Bool,
 				section: 'note',
-				public: false, // mobilePlatform === 'ios',
+				public: mobilePlatform === 'android',
 				appTypes: ['mobile'],
 				label: () => 'Opt-in to the editor beta',
 				description: () => 'This beta adds list continuation, Markdown preview, and Markdown shortcuts. If you find bugs, please report them in the Discourse forum.',
