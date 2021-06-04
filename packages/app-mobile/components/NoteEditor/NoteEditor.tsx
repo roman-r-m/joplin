@@ -1,9 +1,9 @@
 const { _ } = require('@joplin/lib/locale');
 import Setting from '@joplin/lib/models/Setting';
-import { useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Text, NativeSyntheticEvent, TextInputSelectionChangeEventData, TouchableOpacity, View } from 'react-native';
 const { Platform, TextInput } = require('react-native');
 const React = require('react');
+const { connect } = require('react-redux');
 
 interface Selection {
     start: number;
@@ -19,102 +19,115 @@ interface Props {
     theme: any;
 }
 
-export default React.memo(React.forwardRef((props: Props, ref: any) => {
+interface State {
+	text: string;
+	selection: Selection;
+}
 
-	console.log('-----------------------------------------');
+class NoteEditorComponent extends React.Component<Props, State> {
 
-	// console.log(`ZZZ render editor, props: ${JSON.stringify(props)}`);
+	state: State;
 
-	const inputRef = useRef(null);
+	constructor(props: Props) {
+		super(props);
 
-	useImperativeHandle(ref, () => {
-		return {
-			insertAtSelection: async (insert: string) => {
-				console.log(`insert at selection: ${JSON.stringify(selection)}`);
-				if (selection) {
-					const start = selection.start;
-					const end = selection.end;
-					const newText = text.substring(0, start) + insert + text.substring(end);
-					await setText2(newText);
-				} else {
-					await setText2(text + insert);
-				}
-			},
+		this.state = {
+			text: props.defaultValue,
+			selection: props.initialSelection,
 		};
-	});
 
-	const [text, setText] = useState<string>(props.defaultValue);
-	const setText2 = async (text: string) => {
-		setText(text);
-		await props.onChangeText(text);
-	};
-
-	const onChangeText = useCallback(async (text: string) => {
-		await setText2(text);
-	}, [props.onChangeText]);
-
-	const [selection, setSelection] = useState<Selection>(props.initialSelection);
-	const onSelectionChange = useCallback((e: NativeSyntheticEvent<TextInputSelectionChangeEventData>)=> {
-		console.log(`on selection change ${JSON.stringify(e.nativeEvent.selection)}`);
-		if (selection && !e.nativeEvent.selection) return;
-
-		setSelection(e.nativeEvent.selection);
-		props.onSelectionChange(e);
-	}, [props.onSelectionChange]);
-
-	const wrapSelectionWith = async (delimiter: string) => {
-		if (!selection) return;
-
-		const start = selection.start;
-		const end = selection.end;
-		if (start == end) {
-			await setText2(text.substring(0, start) + delimiter + text.substring(start));
-		} else {
-			await setText2(text.substring(0, start) + delimiter + text.substring(start, end) + delimiter + text.substring(end));
-		}
-	};
-
-	const style = Object.assign({}, props.style, { flex: 1 });
-
-	let buttons = null;
-	if (Setting.value('editor.beta')) {
-		buttons =
-		<View style={{ flexDirection: 'row', flex: 0 }}>
-			<TouchableOpacity onPress={_e => wrapSelectionWith('**')}>
-				<Text style={{ padding: 8, fontSize: 16, fontWeight: 'bold' }}>
-					{'B'}
-				</Text>
-			</TouchableOpacity>
-			<TouchableOpacity onPress={_e => wrapSelectionWith('_')}>
-				<Text style={{ padding: 8, fontSize: 16, fontStyle: 'italic' }}>
-					{'I'}
-				</Text>
-			</TouchableOpacity>
-		</View>;
+		this.onSelectionChange = this.onSelectionChange.bind(this);
+		this.onChangeText = this.onChangeText.bind(this);
 	}
 
-	return (
-		<View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-			<TextInput
-				enableMarkdown={Setting.value('editor.beta')}
-				ref={inputRef}
-				autoCapitalize="sentences"
-				style={style}
-				multiline={true}
-				value={text}
-				onChangeText={onChangeText}
-				onSelectionChange={onSelectionChange}
-				blurOnSubmit={false}
-				selectionColor={props.theme.textSelectionColor}
-				keyboardAppearance={props.theme.keyboardAppearance}
-				placeholder={_('Add body')}
-				placeholderTextColor={props.theme.colorFaded}
-				// need some extra padding for iOS so that the keyboard won't cover last line of the note
-				// seehttps://github.com/laurent22/joplin/issues/3607
-				paddingBottom={ Platform.OS === 'ios' ? 40 : 0}
-			/>
-			{buttons}
-		</View>
-	);
+	// shouldComponentUpdate(nextProps, nextState) {
+	// }
 
-}));
+	public async insertAtSelection(insert: string) {
+		if (this.state.selection) {
+			const start = this.state.selection.start;
+			const end = this.state.selection.end;
+			const newText = this.state.text.substring(0, start) + insert + this.state.text.substring(end);
+			await this.setText(newText);
+		} else {
+			await this.setText(this.state.text + insert);
+		}
+	}
+
+	async wrapSelectionWith(delimiter: string) {
+		if (!this.state.selection) return;
+
+		const start = this.state.selection.start;
+		const end = this.state.selection.end;
+		if (start == end) {
+			await this.setText(this.state.text.substring(0, start) + delimiter + this.state.text.substring(start));
+		} else {
+			await this.setText(this.state.text.substring(0, start) + delimiter + this.state.text.substring(start, end) + delimiter + this.state.text.substring(end));
+		}
+	}
+
+	async onSelectionChange(e: NativeSyntheticEvent<TextInputSelectionChangeEventData>) {
+		// console.log(`on selection change ${JSON.stringify(e.nativeEvent.selection)}`);
+		// console.log(`this=${this}, state=${this.state}`);
+		if (this.state.selection && !e.nativeEvent.selection) return;
+
+		this.setState({ selection: e.nativeEvent.selection });
+		this.props.onSelectionChange(e);
+	}
+
+	async onChangeText(text: string) {
+		await this.setText(text);
+	}
+
+	async setText(text: string) {
+		await this.setState({ text: text });
+		await this.props.onChangeText(text);
+	}
+
+	render() {
+		const style = Object.assign({}, this.props.style, { flex: 1 });
+
+		let buttons = null;
+		if (Setting.value('editor.beta')) {
+			buttons =
+			<View style={{ flexDirection: 'row', flex: 0 }}>
+				<TouchableOpacity onPress={_e => this.wrapSelectionWith('**')}>
+					<Text style={{ padding: 8, fontSize: 16, fontWeight: 'bold' }}>
+						{'B'}
+					</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={_e => this.wrapSelectionWith('_')}>
+					<Text style={{ padding: 8, fontSize: 16, fontStyle: 'italic' }}>
+						{'I'}
+					</Text>
+				</TouchableOpacity>
+			</View>;
+		}
+
+		return (
+			<View style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+				<TextInput
+					enableMarkdown={Setting.value('editor.beta')}
+					autoCapitalize="sentences"
+					style={style}
+					multiline={true}
+					value={this.state.text}
+					onChangeText={this.onChangeText}
+					onSelectionChange={this.onSelectionChange}
+					blurOnSubmit={false}
+					selectionColor={this.props.theme.textSelectionColor}
+					keyboardAppearance={this.props.theme.keyboardAppearance}
+					placeholder={_('Add body')}
+					placeholderTextColor={this.props.theme.colorFaded}
+					// need some extra padding for iOS so that the keyboard won't cover last line of the note
+					// seehttps://github.com/laurent22/joplin/issues/3607
+					paddingBottom={ Platform.OS === 'ios' ? 40 : 0}
+				/>
+				{buttons}
+			</View>
+		);
+	}
+
+}
+
+export default connect()(NoteEditorComponent);
