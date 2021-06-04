@@ -412,34 +412,34 @@ class NoteScreenComponent extends BaseScreenComponent {
 		void this.requestGeoLocationPermissions();
 	}
 
-	shouldComponentUpdate(nextProps: any, nextState: any) {
-		const propsDiff = diff(this.props, nextProps);
-		const stateDiff = diff(this.state, nextState);
-		console.log(`note should update
-		props: ${JSON.stringify(propsDiff)}
-		state: ${JSON.stringify(stateDiff)}
-		`);
-		return true;
-	}
+	// shouldComponentUpdate(nextProps: any, nextState: any) {
+	// 	const propsDiff = diff(this.props, nextProps);
+	// 	const stateDiff = diff(this.state, nextState);
+		// console.log(`note should update
+		// props: ${JSON.stringify(propsDiff)}
+		// state: ${JSON.stringify(stateDiff)}
+		// `);
+	// 	return true;
+	// }
 
 	onMarkForDownload(event: any) {
 		void ResourceFetcher.instance().markForDownload(event.resourceId);
 	}
 
-	componentDidUpdate(prevProps: any, prevState: any) {
-		Object.entries(this.props).forEach(([key, val]) => {
-			if (prevProps[key] !== val) {
-				console.log(`Prop '${key}' changed`);
-			}
-		});
-	  	if (this.state) {
-			Object.entries(this.state).forEach(([key, val]) => {
-		  		if (prevState[key] !== val) {
-					console.log(`State '${key}' changed: ${prevState[key]} -> ${val}`);
-				}
-			});
-		}
-	}
+	// componentDidUpdate(prevProps: any, prevState: any) {
+	// 	Object.entries(this.props).forEach(([key, val]) => {
+	// 		if (prevProps[key] !== val) {
+	// 			console.log(`Prop '${key}' changed`);
+	// 		}
+	// 	});
+	//   	if (this.state) {
+	// 		Object.entries(this.state).forEach(([key, val]) => {
+	// 	  		if (prevState[key] !== val) {
+	// 				console.log(`State '${key}' changed: ${prevState[key]} -> ${val}`);
+	// 			}
+	// 		});
+	// 	}
+	// }
 
 	componentWillUnmount() {
 		BackButtonService.removeHandler(this.backHandler);
