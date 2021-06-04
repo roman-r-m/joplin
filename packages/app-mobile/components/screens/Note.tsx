@@ -45,7 +45,6 @@ import CameraView from '../CameraView';
 import NoteEditor from '../NoteEditor/NoteEditor';
 const urlUtils = require('@joplin/lib/urlUtils');
 
-const diff = require('deep-diff').diff;
 
 const emptyArray: any[] = [];
 
@@ -415,10 +414,10 @@ class NoteScreenComponent extends BaseScreenComponent {
 	// shouldComponentUpdate(nextProps: any, nextState: any) {
 	// 	const propsDiff = diff(this.props, nextProps);
 	// 	const stateDiff = diff(this.state, nextState);
-		// console.log(`note should update
-		// props: ${JSON.stringify(propsDiff)}
-		// state: ${JSON.stringify(stateDiff)}
-		// `);
+	// console.log(`note should update
+	// props: ${JSON.stringify(propsDiff)}
+	// state: ${JSON.stringify(stateDiff)}
+	// `);
 	// 	return true;
 	// }
 
