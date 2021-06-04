@@ -52,6 +52,9 @@ public class MarkdownPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
         return Collections.singletonList(new ReactTextInputManager() {
+
+            private TextWatcher mdRenderer;
+
             @ReactProp(name = "enableMarkdown")
             public void setEnableMarkdown(ReactEditText editText, boolean enableMarkdown) {
                 if (enableMarkdown && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -59,7 +62,7 @@ public class MarkdownPackage implements ReactPackage {
                             .includeSourceSpans(IncludeSourceSpans.BLOCKS_AND_INLINES)
                             .build();
 
-                    editText.addTextChangedListener(new TextWatcher() {
+                    mdRenderer = new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                             Log.i("ZZZ", "beforeTextChanged: start=" + start + ", count=" + count + ", after=" + after);
@@ -101,7 +104,7 @@ public class MarkdownPackage implements ReactPackage {
                                     lineStarts.add(i + 1);
                                 }
                             }
-                            final float[] HEADING_SIZES = { 2.0f, 1.5f, 1.17f, 1.0f, .83f, .67f, };
+                            final float[] HEADING_SIZES = {2.0f, 1.5f, 1.17f, 1.0f, .83f, .67f,};
 
                             node.accept(new AbstractVisitor() {
 
@@ -119,7 +122,7 @@ public class MarkdownPackage implements ReactPackage {
                                     }
                                     if (node instanceof Delimited) {
                                         int startDelimiterLen = ((Delimited) node).getOpeningDelimiter().length();
-                                        int endDelimiterLen  = ((Delimited) node).getClosingDelimiter().length();
+                                        int endDelimiterLen = ((Delimited) node).getClosingDelimiter().length();
                                         s.setSpan(new ForegroundColorSpan(Color.LTGRAY), startPos - startDelimiterLen, startPos, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                                         s.setSpan(new ForegroundColorSpan(Color.LTGRAY), endPos, endPos + endDelimiterLen, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                                     }
@@ -164,7 +167,10 @@ public class MarkdownPackage implements ReactPackage {
 
                             Log.w("ZZZ", "delay: " + (System.currentTimeMillis() - start));
                         }
-                    });
+                    };
+                    editText.addTextChangedListener(mdRenderer);
+                } else {
+                    editText.removeTextChangedListener(mdRenderer);
                 }
             }
         });
