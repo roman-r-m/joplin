@@ -64,6 +64,19 @@ class NoteEditorComponent extends React.Component<Props, State> {
 		} else {
 			await this.setText(this.state.text.substring(0, start) + delimiter + this.state.text.substring(start, end) + delimiter + this.state.text.substring(end));
 		}
+		// TODO preserve selection
+	}
+
+	async prependLineWith(delimiter: string) {
+		if (!this.state.selection) return;
+
+		const start = this.state.selection.start;
+		const lineStart = this.state.text.lastIndexOf('\n', start) + 1;
+		let end = lineStart;
+		while (this.state.text.charAt(end) === delimiter) end++;
+		const prefixLen = end - lineStart + 1;
+		const newDelimiter = delimiter.repeat(prefixLen) + (this.state.text.charAt(end) === ' ' ? '' : ' ');
+		await this.setText(this.state.text.substring(0, lineStart) + newDelimiter + this.state.text.substring(end));
 	}
 
 	async onSelectionChange(e: NativeSyntheticEvent<TextInputSelectionChangeEventData>) {
@@ -84,6 +97,18 @@ class NoteEditorComponent extends React.Component<Props, State> {
 		await this.props.onChangeText(text);
 	}
 
+	renderButton(command: Function, text: string, style: object = null) {
+		const defaultStyle = { padding: 8, fontSize: 20 };
+		return (
+			<TouchableOpacity onPress={_e => command()}>
+				<Text style={Object.assign({}, defaultStyle, style)}>
+					{text}
+				</Text>
+			</TouchableOpacity>
+		);
+	}
+
+
 	render() {
 		const style = Object.assign({}, this.props.style, { flex: 1 });
 
@@ -91,16 +116,11 @@ class NoteEditorComponent extends React.Component<Props, State> {
 		if (Setting.value('editor.beta')) {
 			buttons =
 			<View style={{ flexDirection: 'row', flex: 0 }}>
-				<TouchableOpacity onPress={_e => this.wrapSelectionWith('**')}>
-					<Text style={{ padding: 8, fontSize: 16, fontWeight: 'bold' }}>
-						{'B'}
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={_e => this.wrapSelectionWith('_')}>
-					<Text style={{ padding: 8, fontSize: 16, fontStyle: 'italic' }}>
-						{'I'}
-					</Text>
-				</TouchableOpacity>
+				{this.renderButton(() => this.wrapSelectionWith('**'), 'B', { fontWeight: 'bold' })}
+				{this.renderButton(() => this.wrapSelectionWith('_'), 'I', { fontStyle: 'italic' })}
+				{this.renderButton(() => this.wrapSelectionWith('`'), '`')}
+				{this.renderButton(() => this.prependLineWith('#'), '#')}
+				{this.renderButton(() => this.prependLineWith('- [ ]'), '[ ]')}
 			</View>;
 		}
 
