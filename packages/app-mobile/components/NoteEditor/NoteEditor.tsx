@@ -120,6 +120,8 @@ class NoteEditorComponent extends React.Component<Props, State> {
 				{this.renderButton(() => this.wrapSelectionWith('_'), 'I', { fontStyle: 'italic' })}
 				{this.renderButton(() => this.wrapSelectionWith('`'), '`')}
 				{this.renderButton(() => this.prependLineWith('#'), '#')}
+				{this.renderButton(() => this.prependLineWith('*'), '*')}
+				{this.renderButton(() => this.prependLineWith('1.'), '1.')}
 				{this.renderButton(() => this.prependLineWith('- [ ]'), '[ ]')}
 			</View>;
 		}
