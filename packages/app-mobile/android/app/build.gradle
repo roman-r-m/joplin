@@ -206,8 +206,14 @@ android {
     }
 }
 
+def commonmarkVersion = "0.17.2"
+
 dependencies {
-    implementation "org.commonmark:commonmark:0.17.2"
+    implementation "org.commonmark:commonmark:${commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-autolink:${commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-ins:${commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-gfm-strikethrough:${commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-task-list-items:${commonmarkVersion}"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion

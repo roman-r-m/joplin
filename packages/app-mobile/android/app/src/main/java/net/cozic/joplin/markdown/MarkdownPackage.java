@@ -24,6 +24,11 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.views.textinput.ReactEditText;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 
+import org.commonmark.Extension;
+import org.commonmark.ext.autolink.AutolinkExtension;
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
+import org.commonmark.ext.ins.InsExtension;
+import org.commonmark.ext.task.list.items.TaskListItemsExtension;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.BlockQuote;
 import org.commonmark.node.Delimited;
@@ -58,7 +63,14 @@ public class MarkdownPackage implements ReactPackage {
             @ReactProp(name = "enableMarkdown")
             public void setEnableMarkdown(ReactEditText editText, boolean enableMarkdown) {
                 if (enableMarkdown && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    List<Extension> extensions = new ArrayList<>();
+                    extensions.add(AutolinkExtension.create());
+                    extensions.add(StrikethroughExtension.create());
+                    extensions.add(InsExtension.create());
+                    extensions.add(TaskListItemsExtension.create());
+
                     Parser parser = Parser.builder()
+                            .extensions(extensions)
                             .includeSourceSpans(IncludeSourceSpans.BLOCKS_AND_INLINES)
                             .build();
 
