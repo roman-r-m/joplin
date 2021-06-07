@@ -104,7 +104,7 @@ public class MarkdownPackage implements ReactPackage {
                                     lineStarts.add(i + 1);
                                 }
                             }
-                            final float[] HEADING_SIZES = {2.0f, 1.5f, 1.17f, 1.0f, .83f, .67f,};
+                            final float[] HEADING_SIZES = {2.0f, 1.5f, 1.17f, 1.0f, .83f, .83f,};
 
                             node.accept(new AbstractVisitor() {
 
@@ -136,7 +136,9 @@ public class MarkdownPackage implements ReactPackage {
 
                                 @Override
                                 public void visit(Heading heading) {
-                                    setSpans(heading, new TypefaceSpan(Typeface.DEFAULT_BOLD), new RelativeSizeSpan(HEADING_SIZES[heading.getLevel()]));
+                                    if (heading.getLevel() < 6) {
+                                        setSpans(heading, new TypefaceSpan(Typeface.DEFAULT_BOLD), new RelativeSizeSpan(HEADING_SIZES[heading.getLevel()]));
+                                    }
                                     super.visit(heading);
                                 }
 
