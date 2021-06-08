@@ -8,8 +8,6 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.LeadingMarginSpan;
-import android.text.style.QuoteSpan;
-import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
@@ -24,23 +22,40 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.views.textinput.ReactEditText;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 
+import net.cozic.joplin.markdown.spans.BlockquoteSpan;
+import net.cozic.joplin.markdown.spans.BoldSpan;
+import net.cozic.joplin.markdown.spans.CodeSpan;
+import net.cozic.joplin.markdown.spans.HeadingSpan;
+import net.cozic.joplin.markdown.spans.ItalicSpan;
+import net.cozic.joplin.markdown.spans.MarkdownSpan;
+import net.cozic.joplin.markdown.spans.UnderlineSpan;
+
 import org.commonmark.Extension;
-import org.commonmark.ext.autolink.AutolinkExtension;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
+import org.commonmark.ext.ins.Ins;
 import org.commonmark.ext.ins.InsExtension;
-import org.commonmark.ext.task.list.items.TaskListItemsExtension;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.BlockQuote;
+import org.commonmark.node.BulletList;
+import org.commonmark.node.Code;
+import org.commonmark.node.CustomNode;
 import org.commonmark.node.Delimited;
 import org.commonmark.node.Emphasis;
+import org.commonmark.node.FencedCodeBlock;
 import org.commonmark.node.Heading;
+import org.commonmark.node.IndentedCodeBlock;
+import org.commonmark.node.Link;
 import org.commonmark.node.ListItem;
 import org.commonmark.node.Node;
 import org.commonmark.node.OrderedList;
 import org.commonmark.node.SourceSpan;
 import org.commonmark.node.StrongEmphasis;
+import org.commonmark.node.ThematicBreak;
 import org.commonmark.parser.IncludeSourceSpans;
 import org.commonmark.parser.Parser;
+import org.commonmark2.ext.autolink.AutolinkExtension;
+import org.commonmark2.ext.task.list.items.TaskListItemMarker;
+import org.commonmark2.ext.task.list.items.TaskListItemsExtension;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,16 +110,16 @@ public class MarkdownPackage implements ReactPackage {
                             for (StyleSpan span : s.getSpans(0, s.length(), StyleSpan.class)) {
                                 s.removeSpan(span);
                             }
-                            for (RelativeSizeSpan span : s.getSpans(0, s.length(), RelativeSizeSpan.class)) {
+                            for (MarkdownSpan span : s.getSpans(0, s.length(), MarkdownSpan.class)) {
                                 s.removeSpan(span);
                             }
                             for (LeadingMarginSpan.Standard span : s.getSpans(0, s.length(), LeadingMarginSpan.Standard.class)) {
                                 s.removeSpan(span);
                             }
-                            for (QuoteSpan span : s.getSpans(0, s.length(), QuoteSpan.class)) {
+                            for (ForegroundColorSpan span : s.getSpans(0, s.length(), ForegroundColorSpan.class)) {
                                 s.removeSpan(span);
                             }
-                            for (ForegroundColorSpan span : s.getSpans(0, s.length(), ForegroundColorSpan.class)) {
+                            for (CheckboxSpan span : s.getSpans(0, s.length(), CheckboxSpan.class)) {
                                 s.removeSpan(span);
                             }
 
@@ -116,7 +131,7 @@ public class MarkdownPackage implements ReactPackage {
                                     lineStarts.add(i + 1);
                                 }
                             }
-                            final float[] HEADING_SIZES = {2.0f, 1.5f, 1.17f, 1.0f, .83f, .83f,};
+
 
                             node.accept(new AbstractVisitor() {
 
@@ -143,27 +158,37 @@ public class MarkdownPackage implements ReactPackage {
                                 @Override
                                 public void visit(Emphasis emphasis) {
                                     super.visit(emphasis);
-                                    setSpans(emphasis, new StyleSpan(Typeface.ITALIC));
+                                    setSpans(emphasis, new ItalicSpan());
                                 }
 
                                 @Override
                                 public void visit(Heading heading) {
                                     if (heading.getLevel() < 6) {
-                                        setSpans(heading, new TypefaceSpan(Typeface.DEFAULT_BOLD), new RelativeSizeSpan(HEADING_SIZES[heading.getLevel()]));
+                                        setSpans(heading, new BoldSpan(), new HeadingSpan(heading.getLevel()));
                                     }
                                     super.visit(heading);
                                 }
 
                                 @Override
                                 public void visit(ListItem listItem) {
-                                    setSpans(listItem, new LeadingMarginSpan.Standard(30));
+//                                    setSpans(listItem, new LeadingMarginSpan.Standard(30));
                                     super.visit(listItem);
                                 }
 
                                 @Override
                                 public void visit(OrderedList orderedList) {
-                                    setSpans(orderedList, new LeadingMarginSpan.Standard(30));
+                                    setSpans(orderedList,
+                                            new LeadingMarginSpan.Standard(30),
+                                            new ListAutocompleteSpan(orderedList.getDelimiter() + " "));
                                     super.visit(orderedList);
+                                }
+
+                                @Override
+                                public void visit(BulletList bulletList) {
+                                    setSpans(bulletList,
+                                            new LeadingMarginSpan.Standard(30),
+                                            new ListAutocompleteSpan(bulletList.getBulletMarker() + " "));
+                                    super.visit(bulletList);
                                 }
 
                                 @Override
@@ -174,8 +199,54 @@ public class MarkdownPackage implements ReactPackage {
 
                                 @Override
                                 public void visit(BlockQuote blockQuote) {
-                                    setSpans(blockQuote, new QuoteSpan());
+                                    setSpans(blockQuote, new BlockquoteSpan());
                                     super.visit(blockQuote);
+                                }
+
+                                @Override
+                                public void visit(Code code) {
+                                    super.visit(code);
+                                    setSpans(code, new CodeSpan());
+                                }
+
+                                @Override
+                                public void visit(IndentedCodeBlock indentedCodeBlock) {
+                                    super.visit(indentedCodeBlock);
+                                    setSpans(indentedCodeBlock, new LeadingMarginSpan.Standard(30), new CodeSpan());
+                                }
+
+                                @Override
+                                public void visit(FencedCodeBlock fencedCodeBlock) {
+                                    super.visit(fencedCodeBlock);
+                                    setSpans(fencedCodeBlock, new CodeSpan());
+                                }
+
+                                @Override
+                                public void visit(ThematicBreak thematicBreak) {
+                                    super.visit(thematicBreak);
+                                }
+
+                                @Override
+                                public void visit(Link link) {
+                                    super.visit(link);
+                                    // use URLSpan
+                                }
+
+                                @Override
+                                public void visit(CustomNode customNode) {
+                                    if (customNode instanceof TaskListItemMarker) {
+                                        TaskListItemMarker taskListItemMarker = (TaskListItemMarker) customNode;
+
+                                        SourceSpan span = customNode.getSourceSpans().get(0);
+                                        int startPos = lineStarts.get(span.getLineIndex()) + span.getColumnIndex();
+                                        int endPos = startPos + 3;
+                                        // TODO requires LinkMovementMethod to be set on TextView
+                                        s.setSpan(new CheckboxSpan(s, startPos), startPos, endPos, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    } else if (customNode instanceof Ins) {
+                                        Ins ins = (Ins) customNode;
+                                        setSpans(ins, new UnderlineSpan());
+                                    }
+                                    super.visit(customNode);
                                 }
                             });
 
