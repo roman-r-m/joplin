@@ -1,4 +1,4 @@
-package net.cozic.joplin.markdown;
+package net.cozic.joplin.markdown.spans;
 
 import android.text.Editable;
 import android.text.style.ClickableSpan;

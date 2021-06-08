@@ -24,9 +24,11 @@ import com.facebook.react.views.textinput.ReactTextInputManager;
 
 import net.cozic.joplin.markdown.spans.BlockquoteSpan;
 import net.cozic.joplin.markdown.spans.BoldSpan;
+import net.cozic.joplin.markdown.spans.CheckboxSpan;
 import net.cozic.joplin.markdown.spans.CodeSpan;
 import net.cozic.joplin.markdown.spans.HeadingSpan;
 import net.cozic.joplin.markdown.spans.ItalicSpan;
+import net.cozic.joplin.markdown.spans.ListAutocompleteSpan;
 import net.cozic.joplin.markdown.spans.MarkdownSpan;
 import net.cozic.joplin.markdown.spans.UnderlineSpan;
 
