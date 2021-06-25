@@ -116,8 +116,16 @@ export default class ResourceService extends BaseService {
 	}
 
 	public async deleteOrphanResources(expiryDelay: number = null) {
+		console.log(`deleteOrphanResources, expiryDelay=${expiryDelay}`);
+
 		if (expiryDelay === null) expiryDelay = Setting.value('revisionService.ttlDays') * 24 * 60 * 60 * 1000;
+
+		console.log(`deleteOrphanResources, expiryDelay=${expiryDelay}`);
+
 		const resourceIds = await NoteResource.orphanResources(expiryDelay);
+
+		console.log(`resourceIds=${JSON.stringify(resourceIds)}`);
+
 		this.logger().info('ResourceService::deleteOrphanResources:', resourceIds);
 		for (let i = 0; i < resourceIds.length; i++) {
 			const resourceId = resourceIds[i];

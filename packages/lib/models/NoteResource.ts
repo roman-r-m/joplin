@@ -116,6 +116,16 @@ export default class NoteResource extends BaseModel {
 	static async orphanResources(expiryDelay: number = null) {
 		if (expiryDelay === null) expiryDelay = 1000 * 60 * 60 * 24 * 10;
 		const cutOffTime = Date.now() - expiryDelay;
+
+		console.log(`orphanResources: expiryDelay=${expiryDelay}, now=${Date.now()}, cutoff=${cutOffTime}`);
+
+		console.log(`query: SELECT resource_id, sum(is_associated)
+		FROM note_resources
+		GROUP BY resource_id
+		HAVING sum(is_associated) <= 0
+		AND last_seen_time < ${cutOffTime}
+		AND last_seen_time != 0`);
+
 		const output = await this.modelSelectAll(
 			`
 			SELECT resource_id, sum(is_associated)
