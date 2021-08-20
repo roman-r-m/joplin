@@ -9,7 +9,7 @@ __REACT_DEVTOOLS_GLOBAL_HOOK__ = {
 	onCommitFiberRoot: function() {},
 	onCommitFiberUnmount: function() {},
 };
-
+const electron = require('electron');
 const app = require('./app').default;
 const Folder = require('@joplin/lib/models/Folder').default;
 const Resource = require('@joplin/lib/models/Resource').default;
