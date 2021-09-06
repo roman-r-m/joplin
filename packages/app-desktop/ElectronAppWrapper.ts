@@ -375,6 +375,14 @@ export default class ElectronAppWrapper {
 			this.win_.show();
 		});
 
+		this.electronApp_.on('will-finish-launching', function() {
+			// Protocol handler for osx
+			this.electronApp_.on('open-url', (_event: any, url: string) => {
+				_event.preventDefault();
+				void this.openCallbackUrl(url);
+			});
+		});
+
 		this.electronApp_.on('open-url', (_event: any, url: string) => {
 			_event.preventDefault();
 			void this.openCallbackUrl(url);
