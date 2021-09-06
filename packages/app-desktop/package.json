@@ -99,7 +99,15 @@
     },
     "dmg": {
       "writeUpdateInfo": false
-    }
+    },
+    "protocols": [
+      {
+        "name": "joplin",
+        "schemes": [
+          "joplin"
+        ]
+      }
+    ]
   },
   "homepage": "https://github.com/laurent22/joplin#readme",
   "devDependencies": {

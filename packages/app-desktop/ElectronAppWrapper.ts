@@ -356,6 +356,8 @@ export default class ElectronAppWrapper {
 		// the "ready" event. So we use the function below to make sure that the app is ready.
 		await this.waitForElectronAppReady();
 
+		this.electronApp_.setAsDefaultProtocolClient('joplin');
+
 		const alreadyRunning = this.ensureSingleInstance();
 		if (alreadyRunning) return;
 
