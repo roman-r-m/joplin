@@ -333,11 +333,9 @@ export default class ElectronAppWrapper {
 			if (win.isMinimized()) win.restore();
 			win.show();
 			win.focus();
-			if (process.platform !== 'darwin') {
-				const url = argv.find((arg) => isCallbackUrl(arg));
-				if (url) {
-					void this.openCallbackUrl(url);
-				}
+			const url = argv.find((arg) => isCallbackUrl(arg));
+			if (url) {
+				void this.openCallbackUrl(url);
 			}
 		});
 
