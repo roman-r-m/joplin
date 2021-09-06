@@ -326,6 +326,15 @@ export default class ElectronAppWrapper {
 			return true;
 		}
 
+		if (process.platform === 'darwin') {
+			const url = process.argv.find((arg) => isCallbackUrl(arg));
+			if (url) {
+				void this.openCallbackUrl(url);
+			}
+
+			// return false;
+		}
+
 		// Someone tried to open a second instance - focus our window instead
 		this.electronApp_.on('second-instance', (_e: any, argv: string[]) => {
 			const win = this.window();
