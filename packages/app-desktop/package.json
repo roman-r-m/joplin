@@ -107,22 +107,6 @@
           "joplin"
         ]
       }
-    ],
-    "fileAssociations": [
-      {
-        "role": "Editor",
-        "protocols": [
-          {
-            "name": "joplin",
-            "schemes": [
-              "joplin"
-            ]
-          }
-        ],
-        "schemes": [
-          "joplin"
-        ]
-      }
     ]
   },
   "homepage": "https://github.com/laurent22/joplin#readme",
